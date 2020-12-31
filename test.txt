@@ -1,0 +1,19 @@
+## Description ##
+
+> time limit per test: 2 seconds
+> memory limit per test: 256 megabytes
+
+Polycarp has a favorite sequence $$$a[1 \dots n]$$$ consisting of $$$n$$$ integers. He wrote it out on the whiteboard as follows:
+
+### Input ###
+
+The first line contains a single positive integer $$$t$$$ ($$$1 \le t \le 300$$$) — the number of test cases in the test. Then $$$t$$$ test cases follow.
+
+The first line of each test case contains an integer $$$n$$$ ($$$1 \le n \le 300$$$) — the length of the sequence written on the whiteboard.
+
+The next line contains $$$n$$$ integers $$$b_1, b_2,\ldots, b_n$$$ ($$$1 \le b_i \le 10^9$$$) — the sequence written on the whiteboard.
+
+### Output ###
+
+Output $$$t$$$ answers to the test cases. Each answer — is a sequence $$$a$$$ that Polycarp wrote out on the whiteboard.
+
