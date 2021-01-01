@@ -51,9 +51,6 @@ def img_handler(center_tag, logger):
     if len(caption_contents) < 1:
         img_md = '![]({src})'.format(img_src)
     else:
-        img_md = '''<figure>
-          <img src="{src}" alt="">\n'.format(img_src)
-          <figcaption>{cap}</figcaption>\n'.format(caption_contents[0])
-        </figure>'''
+        img_md = '| ![]({src}) |\n| :----------------------------------------------------------: |\n| {cap} |'.format(src=img_src, cap=caption_contents[0])
     
     return img_md

@@ -1,1 +1,0 @@
-The beginning of the result looks like this (of course, if $n \ge 4$).

@@ -7,7 +7,7 @@ import logging
 import coloredlogs
 import codecs
 import content_parser
-from lxml import etree
+import os
 
 # define logging.
 logging.basicConfig(level=logging.INFO,
@@ -29,10 +29,13 @@ class ProblemIdMissMatchError(Exception):
 class EmptyLinkError(Exception):
     pass
 
+# Parsing the command line arguments to get contest id and problem id (e.g. A, B, ...).
 def get_ids():
     parser = argparse.ArgumentParser()
-    parser.add_argument('problem_id', help='id of the problem')
-    parser.add_argument('-l', '--level', type=int, help='the highest title level of generated markdown text')
+    parser.add_argument('problem_id', help='ID of the problem. (e.g. 1462A)')
+    parser.add_argument('-l', '--level', type=int, default=2, help='The highest title level of generated markdown text. If this argument is not explicitly set, it will be 2.')
+    parser.add_argument('-d', '--dir', nargs='?', default='./', help='Root directory of the generated markdown file. If this argument is not explicitly set, it will be current directory.')
+    parser.add_argument('-f', '--filename', nargs='?', default='test.md', help='Name of the generated markdown file. If this argument is not explicitly set, it will be \"test.md\".')
     args = parser.parse_args()
 
     logger.info('Start to deal with problem {}.'.format(args.problem_id))
@@ -47,9 +50,10 @@ def get_ids():
     else:
         contest_id = parse_matcher.group(1)
         prob_id = parse_matcher.group(2).upper()
-        return contest_id, prob_id
+        return contest_id, prob_id, args.level, args.dir, args.filename
 
-def parse_problem(contest_id, prob_id):
+# Load the problem page and parse it, then generate corresponding markdown text.
+def parse_problem(contest_id, prob_id, level, root_dir, filename):
     logger.debug('Parsing problem {}{}'.format(contest_id, prob_id))
 
     header = {
@@ -58,44 +62,19 @@ def parse_problem(contest_id, prob_id):
     url = PROBLEM_URL_SCHEME.format(contest=contest_id, problem=prob_id)
     page = requests.get(url, headers=header)
     soup = BeautifulSoup(page.content, 'html.parser')
-    selector = etree.HTML(page.content);
 
     for br in soup.find_all('br'):
         br.replace_with('\n')
 
-    content_parser.ContentParser(soup, logger, 2)
+    content_list = content_parser.ContentParser(soup, logger, level)
+    content = content_parser.MdGen(content_list, logger)
 
-    # limit_list = content_parser.LimitMessageParser(selector, logger)
-    # state_list = content_parser.StatementParser(soup, logger)
-    # input_state_list = content_parser.InputStateParser(soup, logger)
-    # output_state_list = content_parser.OutputStateParser(soup, logger)
-
-    # for item in state_list:
-    #     item = item.replace('$$$', '$')
-    # for item in input_state_list:
-    #     item = item.replace('$$$', '$')
-    # for item in output_state_list:
-    #     item = item.replace('$$$', '$')
-
-    # with codecs.open('test.txt', 'w', encoding='utf-8') as f:
-    #     print('### Description ###\n', file=f)
-    #     print('> {}: {}'.format(limit_list[0][0], limit_list[0][1]), file=f)
-    #     print('> {}: {}'.format(limit_list[1][0], limit_list[1][1]), file=f)
-    #     print('\n', end='', file=f)
-    #     for item in state_list:
-    #         print(item, file=f)
-    #         print('\n', end='', file=f)
-    #     print('#### Input ####\n', file=f)
-    #     for item in input_state_list:
-    #         print(item, file=f)
-    #         print('\n', end='', file=f)
-    #     print('#### Output ####\n', file=f)
-    #     for item in output_state_list:
-    #         print(item, file=f)
-    #         print('\n', end='', file=f)
-
-    
+    if not os.path.exists(root_dir):
+        os.makedirs(root_dir)
+    path = '{dir}/{file}'.format(dir=root_dir, file=filename)
+    with codecs.open(path, 'w', encoding='utf-8') as f:
+        print(content, file=f)
 
 if __name__ == '__main__':
-    contest_id, prob_id = get_ids()
-    parse_problem(contest_id, prob_id)
+    contest_id, prob_id, level, root_dir, filename = get_ids()
+    parse_problem(contest_id, prob_id, level, root_dir, filename)
