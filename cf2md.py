@@ -32,7 +32,9 @@ class EmptyLinkError(Exception):
 def get_ids():
     parser = argparse.ArgumentParser()
     parser.add_argument('problem_id', help='id of the problem')
+    parser.add_argument('-l', '--level', type=int, help='the highest title level of generated markdown text')
     args = parser.parse_args()
+
     logger.info('Start to deal with problem {}.'.format(args.problem_id))
 
     try:
@@ -61,55 +63,36 @@ def parse_problem(contest_id, prob_id):
     for br in soup.find_all('br'):
         br.replace_with('\n')
 
-    limit_list = content_parser.LimitMessageParser(selector, logger)
-    state_list = content_parser.StatementParser(soup, logger)
-    input_state_list = content_parser.InputStateParser(soup, logger)
-    output_state_list = content_parser.OutputStateParser(soup, logger)
+    content_parser.ContentParser(soup, logger, 2)
 
-    for item in state_list:
-        item = item.replace('$$$', '$')
-    for item in input_state_list:
-        item = item.replace('$$$', '$')
-    for item in output_state_list:
-        item = item.replace('$$$', '$')
+    # limit_list = content_parser.LimitMessageParser(selector, logger)
+    # state_list = content_parser.StatementParser(soup, logger)
+    # input_state_list = content_parser.InputStateParser(soup, logger)
+    # output_state_list = content_parser.OutputStateParser(soup, logger)
 
-    with codecs.open('test.txt', 'w', encoding='utf-8') as f:
-        print('### Description ###\n', file=f)
-        print('> {}: {}'.format(limit_list[0][0], limit_list[0][1]), file=f)
-        print('> {}: {}'.format(limit_list[1][0], limit_list[1][1]), file=f)
-        print('\n', end='', file=f)
-        for item in state_list:
-            print(item, file=f)
-            print('\n', end='', file=f)
-        print('#### Input ####\n', file=f)
-        for item in input_state_list:
-            print(item, file=f)
-            print('\n', end='', file=f)
-        print('#### Output ####\n', file=f)
-        for item in output_state_list:
-            print(item, file=f)
-            print('\n', end='', file=f)
-    
+    # for item in state_list:
+    #     item = item.replace('$$$', '$')
+    # for item in input_state_list:
+    #     item = item.replace('$$$', '$')
+    # for item in output_state_list:
+    #     item = item.replace('$$$', '$')
 
-    # content_parser.statement_parser(soup, logger)
-
-    # STATEMENT_SELECTOR_SCHEME = '#pageContent > div.problemindexholder > div.ttypography > div > div:nth-child({num})'
-    
-    # while True:
-
-    # div_list = soup.select('')
-
-    # text_list = []
-    # for each in div_list:
-    #     text = each.text.strip()
-    #     print(type(text))
-    #     text_list.append(text)
-
-    # logger.debug(len(text_list))
-    
     # with codecs.open('test.txt', 'w', encoding='utf-8') as f:
-    #     for item in text_list:
+    #     print('### Description ###\n', file=f)
+    #     print('> {}: {}'.format(limit_list[0][0], limit_list[0][1]), file=f)
+    #     print('> {}: {}'.format(limit_list[1][0], limit_list[1][1]), file=f)
+    #     print('\n', end='', file=f)
+    #     for item in state_list:
     #         print(item, file=f)
+    #         print('\n', end='', file=f)
+    #     print('#### Input ####\n', file=f)
+    #     for item in input_state_list:
+    #         print(item, file=f)
+    #         print('\n', end='', file=f)
+    #     print('#### Output ####\n', file=f)
+    #     for item in output_state_list:
+    #         print(item, file=f)
+    #         print('\n', end='', file=f)
 
     
 
