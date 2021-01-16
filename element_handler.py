@@ -18,15 +18,18 @@ def p_handler(p_tag, logger):
     # When a piece of text *a* is followed by a piece of bold/italic/
     # typewriter-fonted text *b*, checking whether a[-1] is '"' is
     # needed. If not so, *b* should be added a space at its beginning.
-    def space_add(contents, tmp_str, index):
-        if index > 0:
-            prev_item = contents[index - 1]
-            if isinstance(prev_item, element.Tag):
-                if prev_item.contents[0][-1] != '"':
-                    tmp_str = ' ' + tmp_str
-            else:
-                if prev_item[-1] != '"':
-                    tmp_str = ' ' + tmp_str
+    def space_add(contents, tmp_str, index):        
+        is_not_quote = lambda ch : ch not in ('"', '\'')
+        
+        if is_not_quote(tmp_str[0]):
+            if index > 0:
+                prev_item = contents[index - 1]
+                if isinstance(prev_item, element.Tag):
+                    if is_not_quote(prev_item.contents[0][-1]):
+                        tmp_str = ' ' + tmp_str
+                else:
+                    if is_not_quote(prev_item[-1]):
+                        tmp_str = ' ' + tmp_str
 
         return tmp_str
 
