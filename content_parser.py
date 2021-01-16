@@ -4,6 +4,10 @@ import element_handler
 import traceback
 
 def LimitMessageParser(limit_soup, logger):
+    '''
+    Parsing the time and memory limits.
+    '''
+
     time_limit = limit_soup.find_all(name='div', attrs={'class': 'time-limit'})[0].contents[1]
     memory_limit = limit_soup.find_all(name='div', attrs={'class': 'memory-limit'})[0].contents[1]
 
@@ -12,6 +16,11 @@ def LimitMessageParser(limit_soup, logger):
     return (time_limit_str, memory_limit_str)
 
 def StatementParser(state_soup, logger):
+    '''
+    Parsing a piece of texts, like problem description or input/output \
+    specifications.
+    '''
+
     ret_list = []
     try:
         for item in state_soup:
@@ -21,6 +30,8 @@ def StatementParser(state_soup, logger):
                 ret_list.append(element_handler.ul_handler(item, logger))
             elif item.name == 'center':
                 ret_list.append(element_handler.img_handler(item, logger))
+            elif item.name == 'ol':
+                ret_list.append(element_handler.ol_handler(item, logger))
     except element_handler.TagNotPError:
         traceback.print_exc()
     except element_handler.TagNotUlError:
@@ -29,10 +40,16 @@ def StatementParser(state_soup, logger):
         traceback.print_exc()
     except element_handler.NoImgFoundError:
         traceback.print_exc()
+    except element_handler.TagNotOlError:
+        traceback.print_exc()
     else:
         return ret_list
 
 def ExampleParser(example_soup, logger, level):
+    '''
+    Parsing the examples.
+    '''
+
     input_soup = example_soup.find(class_='input').find(name='pre').contents[0]
     input_soup = '```{data}```'.format(data=input_soup)
     output_soup = example_soup.find(class_='output').find(name='pre').contents[0]
@@ -47,6 +64,10 @@ def ExampleParser(example_soup, logger, level):
     return example_list
 
 def ContentParser(soup, logger, level):
+    '''
+    Parsing the problem content.
+    '''
+
     logger.info('Start to parse contents.')
 
     content_soup = soup.find(class_='problem-statement')
@@ -89,7 +110,12 @@ def ContentParser(soup, logger, level):
     return content_list
 
 def MdGen(content_list, logger):
-    logger.info('Start to generate markdown.')
+    '''
+    Generating the corresponding Markdown text from the \
+    parsed problem content.
+    '''
+
+    logger.info('Start to generate Markdown.')
     content = ''
     for item in content_list:
         if isinstance(item, list) or isinstance(item, tuple):

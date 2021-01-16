@@ -8,6 +8,7 @@ import coloredlogs
 import codecs
 import content_parser
 import os
+import lxml
 
 # define logging.
 logging.basicConfig(level=logging.INFO,
@@ -29,8 +30,12 @@ class ProblemIdMissMatchError(Exception):
 class EmptyLinkError(Exception):
     pass
 
-# Parsing the command line arguments to get contest id and problem id (e.g. A, B, ...).
 def get_ids():
+    '''
+    Parsing the command line arguments to get contest id and problem id \
+    (e.g. 1462A, 1463E1...).
+    '''
+
     parser = argparse.ArgumentParser()
     parser.add_argument('problem_id', help='ID of the problem. (e.g. 1462A)')
     parser.add_argument('-l', '--level', type=int, default=2, help='The highest title level of generated markdown text. If this argument is not explicitly set, it will be 2.')
@@ -55,8 +60,13 @@ def get_ids():
                 prob_id += parse_matcher.group(i)
         return contest_id, prob_id, args.level, args.dir, args.filename
 
-# Load the problem page and parse it, then generate corresponding markdown text.
+
 def parse_problem(contest_id, prob_id, level, root_dir, filename):
+    '''
+    Load the problem page and parse it, then generate corresponding \
+    markdown text.
+    '''
+    
     logger.debug('Parsing problem {}{}'.format(contest_id, prob_id))
 
     header = {
@@ -65,7 +75,7 @@ def parse_problem(contest_id, prob_id, level, root_dir, filename):
     url = PROBLEM_URL_SCHEME.format(contest=contest_id, problem=prob_id)
     page = requests.get(url, headers=header)
     logger.debug('Start to parse HTML.')
-    soup = BeautifulSoup(page.content, 'html.parser')
+    soup = BeautifulSoup(page.content, 'lxml')
 
     for br in soup.find_all('br'):
         br.replace_with('\n')
