@@ -63,7 +63,7 @@ def p_handler(p_tag, logger):
                 tmp_str = '**' + item.contents[0].strip().replace('$$$', '$') + '**'
                 tmp_str = space_add(p_tag.contents, tmp_str, index)
                 content_list.append(tmp_str)
-            elif item_span_class[0] == 'tex_font_style-it':
+            elif item_span_class[0] == 'tex-font-style-it':
                 tmp_str = '*' + item.contents[0].strip().replace('$$$', '$') + '*'
                 tmp_str = space_add(p_tag.contents, tmp_str, index)
                 content_list.append(tmp_str)
