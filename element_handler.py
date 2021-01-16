@@ -14,7 +14,40 @@ def p_handler(p_tag, logger):
     if p_tag.name != 'p':
         raise TagNotPError('Received a tag which is not <p>.')
     
-    content = p_tag.contents[0].strip().replace('$$$', '$')
+    # logger.debug(len(p_tag.contents))
+    # logger.debug(p_tag.contents)
+    # content = p_tag.contents[0].strip().replace('$$$', '$')
+
+    content_list = []
+    for index, item in enumerate(p_tag.contents):
+        if hasattr(item, 'get') == False:
+            tmp_str = item.strip().replace('$$$', '$')
+            if index > 0:
+                tmp_str = ' ' + tmp_str
+            content_list.append(tmp_str)
+        else:
+            item_span_class = item.get('class')
+            if item_span_class[0] == 'tex-font-style-tt':
+                tmp_str = '$\\texttt{' + item.contents[0].strip().replace('$$$', '$') + '}$'
+                if index > 0:
+                    tmp_str = ' ' + tmp_str
+                content_list.append(tmp_str)
+            elif item_span_class[0] == 'tex-font-style-bf':
+                tmp_str = '**' + item.contents[0].strip().replace('$$$', '$') + '**'
+                if index > 0:
+                    tmp_str = ' ' + tmp_str
+                content_list.append(tmp_str)
+            elif item_span_class[0] == 'tex_font_style-it':
+                tmp_str = '*' + item.contents[0].strip().replace('$$$', '$') + '*'
+                if index > 0:
+                    tmp_str = ' ' + tmp_str
+                content_list.append(tmp_str)
+            else:
+                logger.debug('=================')
+                logger.debug(item_span_class)
+                logger.debug(item.contents[0])
+    
+    content = ''.join(content_list)
     return content
 
 def ul_handler(ul_tag, logger):
@@ -26,7 +59,19 @@ def ul_handler(ul_tag, logger):
         for item
         in ul_tag.find_all('li')
     ]
-    
+
+    # ul_contents = []
+    # for item in ul_tag.find_all('li'):
+    #     for cont in item.contents:
+    #         logger.debug('=======================')
+    #         logger.debug(type(cont))
+    #         a = cont.strip()
+    #         logger.debug(type(a))
+    #         a = cont.replace('$$$', '$')
+    #         logger.debug(type(a))
+    #         # ul_contents.append('-' + cont.strip().replace('$$$', '$'))
+    #         ul_contents.append('-' + a)
+
     return ul_contents
 
 def img_handler(center_tag, logger):

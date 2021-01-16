@@ -1,5 +1,5 @@
 # cf2md
-A Python script written in order to easily obtain the Markdown version of a Codeforces problem description.
+A Codeforces problem crawler which generates the texts and the examples in Markdown.
 
 ## Requirements
 

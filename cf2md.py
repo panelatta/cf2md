@@ -41,7 +41,7 @@ def get_ids():
     logger.info('Start to deal with problem {}.'.format(args.problem_id))
 
     try:
-        parse_matcher = re.search(r'^([0-9]+)([A-Z]|[a-z])$', args.problem_id)
+        parse_matcher = re.search(r'^([0-9]+)([A-Z]|[a-z]+)([0-9]*)$', args.problem_id)
         if parse_matcher is None:
             raise ProblemIdMissMatchError
     except ProblemIdMissMatchError:
@@ -50,6 +50,9 @@ def get_ids():
     else:
         contest_id = parse_matcher.group(1)
         prob_id = parse_matcher.group(2).upper()
+        if (group_len := len(parse_matcher.groups())) > 2:
+            for i in range(3, group_len + 1):
+                prob_id += parse_matcher.group(i)
         return contest_id, prob_id, args.level, args.dir, args.filename
 
 # Load the problem page and parse it, then generate corresponding markdown text.
@@ -61,6 +64,7 @@ def parse_problem(contest_id, prob_id, level, root_dir, filename):
     }
     url = PROBLEM_URL_SCHEME.format(contest=contest_id, problem=prob_id)
     page = requests.get(url, headers=header)
+    logger.debug('Start to parse HTML.')
     soup = BeautifulSoup(page.content, 'html.parser')
 
     for br in soup.find_all('br'):
